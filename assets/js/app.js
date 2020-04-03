@@ -11,7 +11,7 @@ gameover.style.fontSize = "3em";
 gameover.style.textTransform = "uppercase";
 gameover.style.backgroundColor = "red";
 gameover.style.width = "100%";
-gameover.addEventListener("click", () => {});
+gameover.addEventListener("click", startGame);
 container.appendChild(gameover);
 
 const ball = document.createElement("div");
@@ -36,3 +36,30 @@ paddle.style.borderRadius = "25px";
 paddle.style.bottom = "30px";
 paddle.style.left = "50%";
 container.appendChild(paddle);
+
+document.addEventListener("keydown", function(e) {
+  if (e.keyCode === 37) paddle.left = true;
+  if (e.keyCode === 39) paddle.right = true;
+});
+document.addEventListener("keyup", function(e) {
+  if (e.keyCode === 37) paddle.left = false;
+  if (e.keyCode === 39) paddle.right = false;
+});
+
+function startGame() {
+  window.requestAnimationFrame(update);
+}
+
+function update() {
+  let pCurrent = paddle.offsetLeft;
+
+  if (paddle.left) {
+    pCurrent -= 5;
+  }
+  if (paddle.right) {
+    pCurrent += 5;
+  }
+
+  paddle.style.left = pCurrent + "px";
+  window.requestAnimationFrame(update);
+}
