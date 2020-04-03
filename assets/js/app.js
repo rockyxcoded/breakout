@@ -41,13 +41,31 @@ document.addEventListener("keydown", function(e) {
   if (e.keyCode === 37) paddle.left = true;
   if (e.keyCode === 39) paddle.right = true;
 });
+
 document.addEventListener("keyup", function(e) {
   if (e.keyCode === 37) paddle.left = false;
   if (e.keyCode === 39) paddle.right = false;
 });
 
+const player = {
+  gameover: true
+};
+
 function startGame() {
-  window.requestAnimationFrame(update);
+  if (player.gameover) {
+    player.gameover = false;
+    gameover.style.display = "none";
+    player.score = 0;
+    player.lives = 3;
+    ball.style.display = "block";
+    updatePlayerScore();
+    window.requestAnimationFrame(update);
+  }
+}
+
+function updatePlayerScore() {
+  document.querySelector(".score").textContent = player.score;
+  document.querySelector(".lives").textContent = player.lives;
 }
 
 function update() {
