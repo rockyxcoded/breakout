@@ -128,10 +128,13 @@ function update() {
   if (!player.gameover) {
     let pCurrent = paddle.offsetLeft;
 
-    if (paddle.left) {
+    if (paddle.left && pCurrent > 0) {
       pCurrent -= 5;
     }
-    if (paddle.right) {
+    if (
+      paddle.right &&
+      pCurrent < containerDimension.width - paddle.offsetWidth
+    ) {
       pCurrent += 5;
     }
 
@@ -147,11 +150,11 @@ function update() {
 }
 
 function waitingOnPaddle() {
-  ball.style.top = (paddle.offsetTop - 22) + "px";
-  ball.style.left = (paddle.offsetLeft + 40) + "px";
+  ball.style.top = paddle.offsetTop - 22 + "px";
+  ball.style.left = paddle.offsetLeft + 40 + "px";
 }
 
-function onFallOff() {
+function fallOff() {
   player.lives--;
   if (player.lives < 0) {
     endGame();
@@ -174,7 +177,7 @@ function stopper() {
   player.inPlay = false;
   player.ballDirection[(0, -5)];
   waitingOnPaddle();
-  window.cancelAnimationFrame(player.animation)
+  window.cancelAnimationFrame(player.animation);
 }
 
 function moveBall() {
@@ -185,7 +188,7 @@ function moveBall() {
 
   if (posBall.y > containerDimension.height - 20 || posBall.y < 0) {
     if (posBall.y > containerDimension.height - 20) {
-      onFallOff();
+      fallOff();
     } else {
       player.ballDirection[1] *= -1;
     }
