@@ -1,5 +1,5 @@
 const container = document.querySelector(".container");
-let containerDimesion = container.getBoundingClientRect();
+let containerDimension = container.getBoundingClientRect();
 
 const gameover = document.createElement("div");
 gameover.textContent = "Start Game";
@@ -37,18 +37,18 @@ paddle.style.bottom = "30px";
 paddle.style.left = "50%";
 container.appendChild(paddle);
 
-document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", function (e) {
   if (e.keyCode === 37) paddle.left = true;
   if (e.keyCode === 39) paddle.right = true;
 });
 
-document.addEventListener("keyup", function(e) {
+document.addEventListener("keyup", function (e) {
   if (e.keyCode === 37) paddle.left = false;
   if (e.keyCode === 39) paddle.right = false;
 });
 
 const player = {
-  gameover: true
+  gameover: true,
 };
 
 function startGame() {
@@ -58,9 +58,47 @@ function startGame() {
     player.score = 0;
     player.lives = 3;
     ball.style.display = "block";
+    positionBricks(30);
     updatePlayerScore();
     window.requestAnimationFrame(update);
   }
+}
+
+function positionBricks(num) {
+  let skip = false;
+  let row = {
+    x: (containerDimension.width % 100) / 2,
+    y: 50,
+  };
+
+  for (let x = 0; x < num; x++) {
+    if (row.x > containerDimension.width - 100) {
+      row.y += 50;
+      if (row.y > (containerDimension.height / 2)) {
+        skip = true;
+      }
+      row.x = (containerDimension.width % 100) / 2;
+    }
+    row.count = x;
+    if (!skip) {
+      createBrick(row);
+    }
+    row.x += 100;
+  }
+}
+
+function createBrick(pos) {
+  const div = document.createElement("div");
+  div.setAttribute("class", "brick");
+  div.style.backgroundColor = randomColor();
+  div.textContent = pos.count + 1;
+  div.style.left = pos.x + "px";
+  div.style.top = pos.y + "px";
+  container.appendChild(div);
+}
+
+function randomColor() {
+  return "#" + Math.random().toString(16).substr(-6);
 }
 
 function updatePlayerScore() {
