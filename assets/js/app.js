@@ -58,6 +58,7 @@ function startGame() {
     player.score = 0;
     player.lives = 3;
     ball.style.display = "block";
+    player.ballDirection = [5,5];
     positionBricks(30);
     updatePlayerScore();
     window.requestAnimationFrame(update);
@@ -74,7 +75,7 @@ function positionBricks(num) {
   for (let x = 0; x < num; x++) {
     if (row.x > containerDimension.width - 100) {
       row.y += 50;
-      if (row.y > (containerDimension.height / 2)) {
+      if (row.y > containerDimension.height / 2) {
         skip = true;
       }
       row.x = (containerDimension.width % 100) / 2;
@@ -108,6 +109,7 @@ function updatePlayerScore() {
 
 function update() {
   let pCurrent = paddle.offsetLeft;
+  moveBall();
 
   if (paddle.left) {
     pCurrent -= 5;
@@ -118,4 +120,22 @@ function update() {
 
   paddle.style.left = pCurrent + "px";
   window.requestAnimationFrame(update);
+}
+
+function moveBall() {
+  let posBall = {
+    x: ball.offsetLeft,
+    y: ball.offsetTop,
+  };
+
+  if (posBall.y > containerDimension.height - 20 || posBall.y < 0) {
+    player.ballDirection[1] *= -1;
+  }
+  if (posBall.x > containerDimension.width - 20 || posBall.x < 0) {
+    player.ballDirection[0] *= -1;
+  }
+  posBall.y += player.ballDirection[1];
+  posBall.x += player.ballDirection[0];
+  ball.style.top = posBall.y + "px";
+  ball.style.left = posBall.x + "px";
 }
