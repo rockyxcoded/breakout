@@ -102,7 +102,7 @@ function randomColor() {
   return "#" + Math.random().toString(16).substr(-6);
 }
 
-function isCollide({ paddle, ball }) {
+function isCollide(paddle, ball) {
   let paddleRect = paddle.getBoundingClientRect();
   let ballRect = ball.getBoundingClientRect();
 
@@ -148,11 +148,21 @@ function moveBall() {
     player.ballDirection[0] *= -1;
   }
 
-  if (isCollide({paddle, ball})) {
+  if (isCollide(paddle, ball)) {
     let temp = (posBall.x - paddle.offsetLeft - paddle.offsetWidth / 2) / 10;
     player.ballDirection[0] = temp;
     player.ballDirection[1] *= -1;
   }
+
+  let bricks = document.querySelectorAll(".brick");
+  bricks.forEach((brick) => {
+    if (isCollide(brick, ball)) {
+      player.ballDirection[1] *= -1;
+      brick.parentNode.removeChild(brick);
+      player.score++;
+      updatePlayerScore();
+    }
+  });
 
   posBall.y += player.ballDirection[1];
   posBall.x += player.ballDirection[0];
