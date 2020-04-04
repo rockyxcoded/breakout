@@ -49,6 +49,7 @@ document.addEventListener("keyup", function (e) {
   if (e.keyCode === 38 && !player.inPlay) player.inPlay = true;
 });
 
+const maxBricks = 30;
 const player = {
   gameover: true,
 };
@@ -64,7 +65,7 @@ function startGame() {
     ball.style.left = paddle.offsetLeft + 50 + "px";
     ball.style.top = paddle.offsetTop - 30 + "px";
     player.ballDirection = [2, -5];
-    positionBricks(30);
+    positionBricks(maxBricks);
     updatePlayerScore();
     player.animation = window.requestAnimationFrame(update);
   }
@@ -205,6 +206,12 @@ function moveBall() {
   }
 
   let bricks = document.querySelectorAll(".brick");
+
+  if (bricks.length == 0) {
+    stopper();
+    positionBricks(maxBricks);
+    
+  }
   bricks.forEach((brick) => {
     if (isCollide(brick, ball)) {
       player.ballDirection[1] *= -1;
