@@ -5,7 +5,8 @@ const gameover = document.createElement("div");
 gameover.textContent = "Start Game";
 gameover.style.position = "absolute";
 gameover.style.color = "white";
-gameover.style.lineHeight = "300px";
+gameover.style.lineHeight = "60px";
+gameover.style.height = "250px";
 gameover.style.textAlign = "center";
 gameover.style.fontSize = "3em";
 gameover.style.textTransform = "uppercase";
@@ -45,6 +46,7 @@ document.addEventListener("keydown", function (e) {
 document.addEventListener("keyup", function (e) {
   if (e.keyCode === 37) paddle.left = false;
   if (e.keyCode === 39) paddle.right = false;
+  if (e.keyCode === 38 && !player.inPlay) player.inPlay = true;
 });
 
 const player = {
@@ -57,11 +59,14 @@ function startGame() {
     gameover.style.display = "none";
     player.score = 0;
     player.lives = 3;
+    player.inPlay = false;
     ball.style.display = "block";
-    player.ballDirection = [5, 5];
+    ball.style.left = paddle.offsetLeft + 50 + "px";
+    ball.style.top = paddle.offsetTop - 30 + "px";
+    player.ballDirection = [2, -5];
     positionBricks(30);
     updatePlayerScore();
-    window.requestAnimationFrame(update);
+    player.animation = window.requestAnimationFrame(update);
   }
 }
 
@@ -120,18 +125,56 @@ function updatePlayerScore() {
 }
 
 function update() {
-  let pCurrent = paddle.offsetLeft;
-  moveBall();
+  if (!player.gameover) {
+    let pCurrent = paddle.offsetLeft;
 
-  if (paddle.left) {
-    pCurrent -= 5;
-  }
-  if (paddle.right) {
-    pCurrent += 5;
-  }
+    if (paddle.left) {
+      pCurrent -= 5;
+    }
+    if (paddle.right) {
+      pCurrent += 5;
+    }
 
-  paddle.style.left = pCurrent + "px";
-  window.requestAnimationFrame(update);
+    paddle.style.left = pCurrent + "px";
+
+    if (!player.inPlay) {
+      waitingOnPaddle();
+    } else {
+      moveBall();
+    }
+    player.animation = window.requestAnimationFrame(update);
+  }
+}
+
+function waitingOnPaddle() {
+  ball.style.top = (paddle.offsetTop - 22) + "px";
+  ball.style.left = (paddle.offsetLeft + 40) + "px";
+}
+
+function onFallOff() {
+  player.lives--;
+  if (player.lives < 0) {
+    endGame();
+    player.lives = 0;
+  }
+  updatePlayerScore();
+  stopper();
+}
+
+function endGame() {
+  gameover.style.display = "block";
+  gameover.innerHTML = "Game Over<br>Your score " + player.score;
+  player.gameover = true;
+  ball.style.display = "none";
+  document.querySelectorAll(".brick").forEach((brick) => {
+    brick.parentNode.removeChild(brick);
+  });
+}
+function stopper() {
+  player.inPlay = false;
+  player.ballDirection[(0, -5)];
+  waitingOnPaddle();
+  window.cancelAnimationFrame(player.animation)
 }
 
 function moveBall() {
@@ -141,7 +184,11 @@ function moveBall() {
   };
 
   if (posBall.y > containerDimension.height - 20 || posBall.y < 0) {
-    player.ballDirection[1] *= -1;
+    if (posBall.y > containerDimension.height - 20) {
+      onFallOff();
+    } else {
+      player.ballDirection[1] *= -1;
+    }
   }
 
   if (posBall.x > containerDimension.width - 20 || posBall.x < 0) {
