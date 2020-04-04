@@ -58,7 +58,7 @@ function startGame() {
     player.score = 0;
     player.lives = 3;
     ball.style.display = "block";
-    player.ballDirection = [5,5];
+    player.ballDirection = [5, 5];
     positionBricks(30);
     updatePlayerScore();
     window.requestAnimationFrame(update);
@@ -102,6 +102,18 @@ function randomColor() {
   return "#" + Math.random().toString(16).substr(-6);
 }
 
+function isCollide({ paddle, ball }) {
+  let paddleRect = paddle.getBoundingClientRect();
+  let ballRect = ball.getBoundingClientRect();
+
+  return !(
+    paddleRect.right < ballRect.left ||
+    paddleRect.left > ballRect.right ||
+    paddleRect.bottom < ballRect.top ||
+    paddleRect.top > ballRect.bottom
+  );
+}
+
 function updatePlayerScore() {
   document.querySelector(".score").textContent = player.score;
   document.querySelector(".lives").textContent = player.lives;
@@ -131,11 +143,20 @@ function moveBall() {
   if (posBall.y > containerDimension.height - 20 || posBall.y < 0) {
     player.ballDirection[1] *= -1;
   }
+
   if (posBall.x > containerDimension.width - 20 || posBall.x < 0) {
     player.ballDirection[0] *= -1;
   }
+
+  if (isCollide({paddle, ball})) {
+    let temp = (posBall.x - paddle.offsetLeft - paddle.offsetWidth / 2) / 10;
+    player.ballDirection[0] = temp;
+    player.ballDirection[1] *= -1;
+  }
+
   posBall.y += player.ballDirection[1];
   posBall.x += player.ballDirection[0];
+
   ball.style.top = posBall.y + "px";
   ball.style.left = posBall.x + "px";
 }
